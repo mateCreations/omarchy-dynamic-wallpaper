@@ -6,6 +6,8 @@ Images are named by hour (`0.jpg`, `6.jpg`, `12.jpg`, etc.) and the script picks
 
 Includes **cliffs** as an example wallpaper set with 24 images (one per hour).
 
+Requires Omarchy 4 or later — the background is applied with `omarchy-theme-bg-set`.
+
 ## Installation
 
 ```bash
