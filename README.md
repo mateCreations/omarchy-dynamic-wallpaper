@@ -2,11 +2,11 @@
 
 Dynamic wallpaper for [Omarchy](https://omarchy.org) — automatically changes based on the time of day.
 
-Images are named by hour (`0.jpg`, `6.jpg`, `12.jpg`, etc.) and the script picks the closest match for the current time. Runs hourly via a systemd timer.
+Images are named by hour (`0.jpg`, `6.jpg`, `12.jpg`, etc.) and the script picks the closest match for the current time. During the final five minutes of an hour, it asks the Omarchy background shell to blend toward the next image so the change reads more like the day passing.
 
 Includes **cliffs** as an example wallpaper set with 24 images (one per hour).
 
-Requires Omarchy 4 or later — the background is applied with `omarchy-theme-bg-set`.
+Requires Omarchy 4 or later — the background is applied through Omarchy's current background state link, with shell IPC used for smooth transitions when available.
 
 ## Installation
 
