@@ -1,70 +1,80 @@
 # omarchy-dynamic-wallpaper
 
-Dynamic wallpaper for [Omarchy](https://omarchy.org) — automatically changes based on the time of day.
+Omarchy plugin that changes the desktop background through the day, using your
+own folder of images. During the last minutes of each hour it asks the Omarchy
+background shell to blend toward the next image, so the change reads more like
+the day passing than a wallpaper swap.
 
-Images are named by hour (`0.jpg`, `6.jpg`, `12.jpg`, etc.) and the script picks the closest match for the current time. During the final five minutes of an hour, it asks the Omarchy background shell to blend toward the next image so the change reads more like the day passing.
+Requires Omarchy 4 or later. No images are bundled — bring your own.
 
-Includes **cliffs** as an example wallpaper set with 24 images (one per hour).
-
-Requires Omarchy 4 or later — the background is applied through Omarchy's current background state link, with shell IPC used for smooth transitions when available.
-
-## Installation
-
-```bash
-git clone https://github.com/mateCreations/omarchy-dynamic-wallpaper
-cd omarchy-dynamic-wallpaper
-```
-
-Copy the script:
+## Install
 
 ```bash
-cp dynamic-wallpaper ~/.local/bin/
-chmod +x ~/.local/bin/dynamic-wallpaper
+omarchy plugin add https://github.com/mateCreations/omarchy-dynamic-wallpaper --enable
 ```
 
-Copy your wallpaper set:
+Then drop any images into `~/.config/omarchy/backgrounds/dynamic/`:
 
 ```bash
-cp -r backgrounds/cliffs ~/.config/omarchy/backgrounds/
+mkdir -p ~/.config/omarchy/backgrounds/dynamic
+cp ~/Pictures/my-wallpapers/*.jpg ~/.config/omarchy/backgrounds/dynamic/
+omarchy restart shell
 ```
 
-Copy and enable the systemd units:
+That is the whole setup. `.jpg`, `.jpeg`, `.png`, and `.webp` are picked up.
+
+## How images map to the day
+
+Images are used in filename order and spread evenly across 24 hours. Two
+images change every twelve hours, four change every six, twenty-four change
+every hour. Name them so they sort in the order you want them to appear:
+
+```
+~/.config/omarchy/backgrounds/dynamic/
+├── 01-dawn.jpg     # 00h → 05h
+├── 02-noon.jpg     # 06h → 11h
+├── 03-dusk.jpg     # 12h → 17h
+└── 04-night.jpg    # 18h → 23h
+```
+
+Naming files after the hour works too: a set of `0.jpg` through `23.jpg`
+gives one image per hour.
+
+## Options
+
+Both are environment variables read by `bin/dynamic-wallpaper`:
+
+- `DYNAMIC_WALLPAPER_SET` — folder to use, either an absolute path or a name
+  under `~/.config/omarchy/backgrounds`. Defaults to `dynamic`.
+- `DYNAMIC_WALLPAPER_TRANSITION_MINUTES` — length of the crossfade into the
+  next image, in minutes. Defaults to `5`; set `0` to switch instantly.
+
+The script can also be run by hand against any folder:
 
 ```bash
-cp systemd/dynamic-wallpaper.* ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now dynamic-wallpaper.timer
+~/.config/omarchy/plugins/harbefas.dynamic-wallpaper/bin/dynamic-wallpaper ~/Pictures/some-set
 ```
 
-## Usage
+## Requirements
+
+A standard Linux userland only: `bash`, `awk`, `find`, and `date`. The plugin
+makes no network requests, installs no system service, and needs no elevated
+privileges. It writes exactly one path outside its own directory, the Omarchy
+background state link at `~/.local/state/omarchy/current/background`, which is
+the supported way to set the current background.
+
+## Remove
 
 ```bash
-# Run manually with a wallpaper set
-dynamic-wallpaper cliffs
-
-# Check timer status
-systemctl --user status dynamic-wallpaper.timer
+omarchy plugin remove harbefas.dynamic-wallpaper
 ```
 
-## Adding your own wallpaper set
+Your images in `~/.config/omarchy/backgrounds/dynamic/` are left untouched;
+delete that folder yourself if you want it gone. Pick a new background through
+the Omarchy menu afterwards to replace the last one this plugin set.
 
-Create a folder under `~/.config/omarchy/backgrounds/<name>/` and add images named by hour:
+## License
 
-```
-~/.config/omarchy/backgrounds/my-set/
-├── 0.jpg    # midnight → 5h
-├── 6.jpg    # 6h → 11h
-├── 12.jpg   # 12h → 17h
-└── 18.jpg   # 18h → 23h
-```
-
-You don't need an image for every hour — the script picks the closest one that is ≤ the current hour.
-
-Then update the service to use your set:
-
-```ini
-# ~/.config/systemd/user/dynamic-wallpaper.service
-ExecStart=%h/.local/bin/dynamic-wallpaper my-set
-```
+MIT
 
 Part of the [mateCreations](https://github.com/mateCreations) ecosystem.

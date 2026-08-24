@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "harbefas.dynamic-wallpaper",
+  "name": "Dynamic wallpaper",
+  "version": "2.0.0",
+  "author": "harbefas",
+  "license": "MIT",
+  "description": "Changes the desktop background through the day using your own folder of images",
+  "kinds": ["service"],
+  "entryPoints": { "service": "Service.qml" }
+}
